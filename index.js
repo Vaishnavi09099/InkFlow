@@ -153,8 +153,10 @@ app.post("/users",async (req,res)=>{
     }
 })
 
-app.get("/users",(req,res)=>{
+app.get("/users",async (req,res)=>{
     try{
+            const users = await User.find({}) //sare users dedo
+        //db call
         return res.status(200).json({
             success:true,
             message:"Users fetched successfully",
@@ -171,9 +173,12 @@ app.get("/users",(req,res)=>{
     }
 })
 
-app.get("/users/:id",(req,res)=>{
+app.get("/users/:id",async(req,res)=>{
     try{
-        const user = users.filter((user)=>user.id == req.params.id)
+
+        const id = req.params.id;
+        const user = await User.findById(id)
+      
         if(!user){
              return res.status(404).json({
             success:false,
@@ -200,23 +205,26 @@ app.get("/users/:id",(req,res)=>{
     }
 })
 
-app.put("/users/:id",(req,res)=>{
+app.put("/users/:id",async(req,res)=>{
     
     
-     try{
+     try{  
         const {id} = req.params
-        const index = users.findIndex(user => user.id == id)
-        if(index==-1){
+           const {name,email,password} = req.body
+        const updatedUser = await User.findByIdAndUpdate(id,{name,email,password},{new:true})
+      
+       
+       
+        if(!updatedUser){
             return res.status(404).json({
                 success:false,
                 message:"User not found"
             })
         }
 
-        users[index]={...users[index],...req.body}
         return res.status(200).json({
             message:"user updated successfully",
-        user:users[index],
+       
     })
 
     }
@@ -226,32 +234,32 @@ app.put("/users/:id",(req,res)=>{
     }
 })
 
-app.delete("/users/:id",(req,res)=>{
-    try{
-
-           const {id} = req.params
-        const index = users.findIndex(user => user.id == id)
-        if(index==-1){
+app.delete("/users/:id",async(req,res)=>{
+       
+    
+     try{  
+        const {id} = req.params
+           const {name,email,password} = req.body
+        const deletedUser = await User.findByIdAndDelete(id)
+      
+       
+       
+        if(!deletedUser){
             return res.status(404).json({
                 success:false,
                 message:"User not found"
             })
         }
-        users = users.filter((user)=>user.id != req.params.id)
-        
-             return res.status(200).json({
-            success:false,
-            message:"User deleted successfully",
-            users,
-        })
+
+        return res.status(200).json({
+            message:"user deleted successfully",
+            deletedUser
        
+    })
 
     }
     catch(err){
-          return res.status(500).json({
-            success:false,
-            message:"error deleting user",
-        })
+        return res.status(500).json({message : "user not found"})
 
     }
 })
