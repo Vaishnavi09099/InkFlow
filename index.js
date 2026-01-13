@@ -1,8 +1,35 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
+const mongoose = require("mongoose")
 const blogs = []
 
 app.use(express.json());
+app.use(cors())
+
+//m28xW0KtgTZYdOLm
+//mongodb+srv://vaishnavi09099_db_user:<db_password>@cluster0.qqwp4ji.mongodb.net/?appName=Cluster0
+
+async function dbConnect(){
+    try{
+        await mongoose.connect("mongodb+srv://vaishnavi09099_db_user:m28xW0KtgTZYdOLm@cluster0.qqwp4ji.mongodb.net/BlogDatabase");
+        console.log("Db connected successfully");
+    }catch(error){
+        console.log("Error agaya while connecting db");
+        console.log(error);
+    }
+}
+
+const userSchema = new mongoose.Schema({
+    name : String,
+    email : {
+        type:String,
+        unique:true
+    },
+    password : String
+})
+
+const User = mongoose.model("User",userSchema);
 
 app.post("/blogs",(req,res)=>{
     try{
@@ -71,9 +98,11 @@ app.delete("/blogs/:id",(req,res)=>{
 
 
 
-let users = [];
-app.post("/users",(req,res)=>{
+
+app.post("/users",async (req,res)=>{
     const{name,password,email }=req.body;
+    console.log(req.body)
+
     try{
         if(!name){
             return res.status(400).json({
@@ -93,10 +122,24 @@ app.post("/users",(req,res)=>{
                 message:"Please fill the email",
             })
         }
-        users.push({...req.body,id:users.length+1});
+
+        const checkForExistingUser = await User.findOne({email})
+        if(checkForExistingUser){
+            return res.status(400).json({
+                success:false,
+                message:"User already registered with this email"
+            })
+        }
+        const newUser = await User.create({
+            name,
+            email,
+            password,
+        });
+
         return res.status(200).json({
             success:true,
             message:"user created successfully",
+            newUser
         });
 
     }
@@ -104,6 +147,7 @@ app.post("/users",(req,res)=>{
         return res.status(500).json({
             success:false,
             message:"Please try again",
+            error:err.message
         })
 
     }
@@ -211,7 +255,7 @@ app.delete("/users/:id",(req,res)=>{
 
     }
 })
-
+dbConnect();
 
 
 app.listen(3000,()=>{
