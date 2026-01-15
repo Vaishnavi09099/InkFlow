@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import { useEffect } from 'react'
+
 
 
 function App() {
@@ -10,9 +12,21 @@ function App() {
     password:"",
   })
 
+  const [blogs,setBlogs] = useState([])
 
-  async function handleSumbit(){
-    let data = await fetch('http://localhost:3000/users',{
+  async function fetchBlogs(){
+    let data = await fetch("http://localhost:3000/api/v1/blogs");
+    let res = await data.json();
+    console.log(res.blog);
+    setBlogs(res.blog || res.blogs)
+  }
+
+  useEffect(()=>{
+    fetchBlogs();
+  },[])
+
+  async function handleSubmit(){
+    let data = await fetch('http://localhost:3000/api/v1/users',{
       method:'POST',
       body:JSON.stringify(userData),
       headers:{
@@ -61,8 +75,23 @@ function App() {
       </div>
         <br />
         <br />
-      <button onClick={handleSumbit}>Submit</button>
+      <button onClick={handleSubmit}>Submit</button>
+
+
+
+<div>
+  {
+        blogs.map(blog =>(
+          <ul>
+            <li>{blog.title}</li>
+            <li>{blog.description}</li>
+          </ul>
+        ))
+      }
+</div>
+      
     </div>
+    
   )
 }
 

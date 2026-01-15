@@ -1,68 +1,25 @@
 const express = require("express")
+
+const {
+      createBlog,
+    getBlogs,
+    getBlogById,
+    updateBlog,
+    removeBlog
+
+} = require("../controllers/blogController")
 const route = express.Router();
 
 
-route.post("/blogs",(req,res)=>{
-    try{
-        blogs.push({...req.body,id:blogs.length+1});
-        return res.json({message:"blog created successfully"});
-
-    }
-    catch(err){
-        return res.status(500).json({message:"blog creation error"});
-
-    }
-})
+route.post("/blogs",createBlog)
 
 
-route.get("/blogs",(req,res)=>{
-    try{
-        let publicBlogs = blogs.filter(blog => !blog.draft)
-        return res.json({publicBlogs})
+route.get("/blogs",getBlogs)
 
-    }
-    catch(err){
-        return res.json({message: "Cannot fetch blogs"})
+route.get("/blogs/:id",getBlogById)
 
-    }
-})
+route.patch("/blogs/:id",updateBlog)
 
-route.get("/blogs/:id",(req,res)=>{
-    try{
-        const {id} = req.params;
-        let searchBlog = blogs.filter(blog => blog.id == id)
-        return res.json({searchBlog})
-    }
-    catch(err){
-        return res.json({message: "error fetching info"})
-    }
-})
+route.delete("/blogs/:id",removeBlog)
 
-route.patch("/blogs/:id",(req,res)=>{
-    try{
-        const {id} = req.params
-        let index = blogs.findIndex(blog => blog.id == id)
-        blogs[index]={...blogs[index],...req.body}
-        return res.json({message:"updated successfully"})
-
-    }
-    catch(err){
-        return res.status(500).json({message : "Blog updated successfully"})
-
-    }
-})
-
-route.delete("/blogs/:id",(req,res)=>{
-    try{
-        const {id} = req.params
-        let updatedAfter = blogs.filter(blog => blog.id != id)
-        return res.json({updatedAfter})
-
-    }
-    catch(err){
-        return res.status(500).json({message : "error in deletion"})
-
-    }
-})
-
-module.exports = route
+module.exports = route;
