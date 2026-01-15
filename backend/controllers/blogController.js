@@ -1,8 +1,9 @@
-const Blog = require("../models/blogSchema")
+const Blog = require("../models/blogSchema");
+const User = require("../models/userSchema");
 
 async function createBlog(req,res){
     try{
-        const {title,description,draft}=req.body;
+        const {title,description,draft,creator}=req.body;
         if(!title){
             return res.status(400).json({
                 message:"Please fill title",
@@ -14,7 +15,17 @@ async function createBlog(req,res){
             })
         }
 
-        const blog = await Blog.create({description,title,draft});
+        const findUser = await User.findById(creator)
+
+        if(!findUser){
+            return res.status(500).json({
+                message:"Kon hai bhau tiii"
+            })
+        }
+
+        const blog = await Blog.create({description,title,draft,creator});
+
+        await User.findByIdAndUpdate(creator,{$push: {blogs:blog}});
 
         return res.status(200).json({
             message:"Blog created successfully",
