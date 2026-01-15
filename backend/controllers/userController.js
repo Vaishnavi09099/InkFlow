@@ -1,105 +1,7 @@
-const express = require("express");
-const app = express();
-const cors = require("cors");
-const mongoose = require("mongoose")
-const blogs = []
-
-app.use(express.json());
-app.use(cors())
-
-//m28xW0KtgTZYdOLm
-//mongodb+srv://vaishnavi09099_db_user:<db_password>@cluster0.qqwp4ji.mongodb.net/?appName=Cluster0
-
-async function dbConnect(){
-    try{
-        await mongoose.connect("mongodb+srv://vaishnavi09099_db_user:m28xW0KtgTZYdOLm@cluster0.qqwp4ji.mongodb.net/BlogDatabase");
-        console.log("Db connected successfully");
-    }catch(error){
-        console.log("Error agaya while connecting db");
-        console.log(error);
-    }
-}
-
-const userSchema = new mongoose.Schema({
-    name : String,
-    email : {
-        type:String,
-        unique:true
-    },
-    password : String
-})
-
-const User = mongoose.model("User",userSchema);
-
-app.post("/blogs",(req,res)=>{
-    try{
-        blogs.push({...req.body,id:blogs.length+1});
-        return res.json({message:"blog created successfully"});
-
-    }
-    catch(err){
-        return res.status(500).json({message:"blog creation error"});
-
-    }
-})
+const User = require("../models/User")
 
 
-app.get("/blogs",(req,res)=>{
-    try{
-        let publicBlogs = blogs.filter(blog => !blog.draft)
-        return res.json({publicBlogs})
-
-    }
-    catch(err){
-        return res.json({message: "Cannot fetch blogs"})
-
-    }
-})
-
-app.get("/blogs/:id",(req,res)=>{
-    try{
-        const {id} = req.params;
-        let searchBlog = blogs.filter(blog => blog.id == id)
-        return res.json({searchBlog})
-    }
-    catch(err){
-        return res.json({message: "error fetching info"})
-    }
-})
-
-app.patch("/blogs/:id",(req,res)=>{
-    try{
-        const {id} = req.params
-        let index = blogs.findIndex(blog => blog.id == id)
-        blogs[index]={...blogs[index],...req.body}
-        return res.json({message:"updated successfully"})
-
-    }
-    catch(err){
-        return res.status(500).json({message : "Blog updated successfully"})
-
-    }
-})
-
-app.delete("/blogs/:id",(req,res)=>{
-    try{
-        const {id} = req.params
-        let updatedAfter = blogs.filter(blog => blog.id != id)
-        return res.json({updatedAfter})
-
-    }
-    catch(err){
-        return res.status(500).json({message : "error in deletion"})
-
-    }
-})
-
-
-
-
-
-
-app.post("/users",async (req,res)=>{
+async function createUser(req,res){
     const{name,password,email }=req.body;
     console.log(req.body)
 
@@ -151,10 +53,11 @@ app.post("/users",async (req,res)=>{
         })
 
     }
-})
+}
 
-app.get("/users",async (req,res)=>{
-    try{
+
+async function getUsers(req,res){
+       try{
             const users = await User.find({}) //sare users dedo
         //db call
         return res.status(200).json({
@@ -171,9 +74,9 @@ app.get("/users",async (req,res)=>{
         })
 
     }
-})
-
-app.get("/users/:id",async(req,res)=>{
+    
+}
+async function getUsersById(req,res){
     try{
 
         const id = req.params.id;
@@ -203,12 +106,10 @@ app.get("/users/:id",async(req,res)=>{
         })
 
     }
-})
 
-app.put("/users/:id",async(req,res)=>{
-    
-    
-     try{  
+}
+async function updateUser(req,res){
+       try{  
         const {id} = req.params
            const {name,email,password} = req.body
         const updatedUser = await User.findByIdAndUpdate(id,{name,email,password},{new:true})
@@ -232,11 +133,10 @@ app.put("/users/:id",async(req,res)=>{
         return res.status(500).json({message : "user not found"})
 
     }
-})
 
-app.delete("/users/:id",async(req,res)=>{
-       
-    
+}
+async function removeUser(req,res){
+      
      try{  
         const {id} = req.params
            const {name,email,password} = req.body
@@ -262,10 +162,13 @@ app.delete("/users/:id",async(req,res)=>{
         return res.status(500).json({message : "user not found"})
 
     }
-})
-dbConnect();
 
+}
 
-app.listen(3000,()=>{
-    console.log("server started");
-})
+module.exports = {
+    createUser,
+    getUsers,
+    getUsersById,
+    updateUser,
+    removeUser
+}
