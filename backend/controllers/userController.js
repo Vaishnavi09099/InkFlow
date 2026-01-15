@@ -1,5 +1,5 @@
 const User = require("../models/userSchema")
-
+const bcrypt = require("bcrypt")
 
 async function createUser(req,res){
     const{name,password,email }=req.body;
@@ -32,10 +32,14 @@ async function createUser(req,res){
                 message:"User already registered with this email"
             })
         }
+        let salt = await bcrypt.genSalt(5)
+
+        const hashedPass = await bcrypt.hash(password,salt)
+    
         const newUser = await User.create({
             name,
             email,
-            password,
+            password : hashedPass,
         });
 
         return res.status(200).json({
@@ -54,6 +58,68 @@ async function createUser(req,res){
 
     }
 }
+
+async function loginUser(req,res){
+    const{password,email }=req.body;
+    console.log(req.body)
+
+    try{
+        
+        
+        if(!password){
+            return res.status(400).json({
+                success:false,
+                message:"Please fill the password"
+            })
+        }
+        if(!email){
+            return res.status(400).json({
+                success:false,
+                message:"Please fill the email",
+            })
+        }
+
+        const checkForExistingUser = await User.findOne({email})
+        if(!checkForExistingUser){
+            return res.status(400).json({
+                success:false,
+                message:"User does not exist"
+            })
+        }
+       
+        
+
+
+        let checkForPass = await bcrypt.compare(
+            password,
+            checkForExistingUser.password,
+           
+        
+        )
+if(!checkForPass){
+            return res.status(400).json({
+                success:false,
+                message:"Wrong password"
+            })
+        }
+
+        return res.status(200).json({
+            success:true,
+            message:"User LogedIn successfully",
+          
+        });
+
+    }
+    catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"Please try again",
+            error:err.message
+        })
+
+    }
+}
+
 
 
 async function getUsers(req,res){
@@ -167,6 +233,7 @@ async function removeUser(req,res){
 
 module.exports = {
     createUser,
+    loginUser,
     getUsers,
     getUsersById,
     updateUser,

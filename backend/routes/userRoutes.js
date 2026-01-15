@@ -2,6 +2,7 @@ const express = require("express");
 const {
     createUser,
     getUsers,
+    loginUser,
     getUsersById,
     updateUser,
     removeUser
@@ -14,6 +15,7 @@ const route = express.Router();
 
 
 route.post("/users",createUser)
+route.post("/login",loginUser)
 
 route.get("/users",getUsers)
 
