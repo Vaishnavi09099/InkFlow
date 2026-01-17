@@ -1,4 +1,5 @@
 const express = require("express")
+const verifyUser = require("../middlewares/auth")
 
 const {
       createBlog,
@@ -11,7 +12,7 @@ const {
 const route = express.Router();
 
 
-route.post("/blogs",createBlog)
+route.post("/blogs",verifyUser,createBlog)
 
 
 route.get("/blogs",getBlogs)

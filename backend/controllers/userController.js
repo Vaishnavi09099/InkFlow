@@ -1,5 +1,7 @@
 const User = require("../models/userSchema")
 const bcrypt = require("bcrypt")
+const {generateJWT} = require("../utils/generateToken")
+
 
 async function createUser(req,res){
     const{name,password,email }=req.body;
@@ -40,12 +42,26 @@ async function createUser(req,res){
             name,
             email,
             password : hashedPass,
-        });
+        })
+
+        let token = await generateJWT({
+            email : newUser.email,
+            id: newUser._id,
+        })
+
+
 
         return res.status(200).json({
             success:true,
             message:"user created successfully",
-            newUser
+            user: {
+                name :newUser.name,
+                email:newUser.email,
+                blogs:newUser.blogs,
+                  token
+                
+            },
+          
         });
 
     }
@@ -103,9 +119,16 @@ if(!checkForPass){
             })
         }
 
+           let token = await generateJWT({
+            email : checkForExistingUser.email,
+            id: checkForExistingUser._id,
+        })
+
         return res.status(200).json({
             success:true,
             message:"User LogedIn successfully",
+            user:checkForExistingUser,
+            token
           
         });
 

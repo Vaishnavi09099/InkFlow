@@ -1,9 +1,15 @@
 const Blog = require("../models/blogSchema");
 const User = require("../models/userSchema");
+const {verifyJWT, decodeJWT} = require("../utils/generateToken")
 
+//safe controllers
 async function createBlog(req,res){
     try{
-        const {title,description,draft,creator}=req.body;
+       console.log("Create blog controller");
+       
+       const creator = req.user;
+    
+        const {title,description,draft}=req.body;
         if(!title){
             return res.status(400).json({
                 message:"Please fill title",
@@ -25,7 +31,7 @@ async function createBlog(req,res){
 
         const blog = await Blog.create({description,title,draft,creator});
 
-        await User.findByIdAndUpdate(creator,{$push: {blogs:blog}});
+        await User.findByIdAndUpdate(creator,{$push: {blogs:blog._id}});
 
         return res.status(200).json({
             message:"Blog created successfully",
