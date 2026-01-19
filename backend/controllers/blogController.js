@@ -117,9 +117,24 @@ async function updateBlog(req,res){
 
 async function removeBlog(req, res) {
   try {
+    const creator =req.user;
     const { id } = req.params;
 
-    const deletedBlog = await Blog.findByIdAndDelete(id);
+  const blog = await Blog.findById(id)
+
+  if(!blog){
+    return res.status(500).json({
+        message: "Blog is not found"
+    })
+  }
+        if((creator != blog.creator)){
+            return res.status(500).json({
+                message: "You are not authorized for this action"
+            });
+        }
+
+        await Blog.findByIdAndDelete(id);
+    await User.findByIdAndUpdate(creator,{$pull : {blogs: id}})
 
     if (!deletedBlog) {
       return res.status(404).json({
