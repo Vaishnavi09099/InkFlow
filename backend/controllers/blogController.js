@@ -48,7 +48,16 @@ async function createBlog(req,res){
 }
 async function getBlogs(req,res){
     try{
-        const blogs = await Blog.find({});
+        const blogs = await Blog.find({ draft:false}).populate({
+            path : "creator",
+            select:"-password",
+
+        }).populate({
+            path:"likes",
+            select:"email name"
+
+        })
+        
         return res.status(200).json({
             message:"Blog fetched successfully",
             blogs
@@ -62,24 +71,35 @@ async function getBlogs(req,res){
     }
 
 }
-async function getBlogById(req,res){
-     try{
-        const {id} = req.params
-        const blog = await Blog.findById(id);
-        return res.status(200).json({
-            message:"Blog fetched successfullyy",
-            blog
-        }) 
+async function getBlogById(req, res) {
+  try {
+    const creator = req.user; // JWT middleware se aaya
 
-    }
-    catch(err){
-           return res.status(500).json({
-            message:err.message,
-        })
-        
+    // user exist karta hai ya nahi
+    const user = await User.findById(creator).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
     }
 
+    // us user ke blogs nikaalo
+    const blogs = await Blog.find({ creator });
+
+    return res.status(200).json({
+      success: true,
+      message: "User blogs fetched successfully",
+      blogs,
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
 }
+
 async function updateBlog(req,res){
      try{
        
@@ -154,11 +174,52 @@ async function removeBlog(req, res) {
   }
 }
 
+async function likeBlog(req, res) {
+  try {
+    const creator =req.user;
+    const { id } = req.params;
+
+  const blog = await Blog.findById(id)
+
+  if(!blog){
+    return res.status(500).json({
+        message: "Blog is not found"
+    })
+  }
+
+//like-->dislike
+
+  if(!blog.likes.includes(creator)){
+
+    await Blog.findByIdAndUpdate(id,{ $push:{likes: creator}})
+
+    return res.status(200).json({
+        success:true,
+        message:"Blog liked successfully",
+    })
+  }else{
+     await Blog.findByIdAndUpdate(id,{ $pull:{likes: creator}})
+    return res.status(200).json({
+        success:true,
+        message:"Blog disliked successfully"
+    })
+  }
+       
+
+
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+}
+
 
 module.exports ={
     createBlog,
     getBlogs,
     getBlogById,
     updateBlog,
+    likeBlog,
     removeBlog
 }

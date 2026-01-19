@@ -6,6 +6,7 @@ const {
     getBlogs,
     getBlogById,
     updateBlog,
+    likeBlog,
     removeBlog
 
 } = require("../controllers/blogController")
@@ -17,10 +18,12 @@ route.post("/blogs",verifyUser,createBlog)
 
 route.get("/blogs",getBlogs)
 
-route.get("/blogs/:id",getBlogById)
+route.get("/blogs/:id",verifyUser,getBlogById)
 
 route.patch("/blogs/:id",verifyUser,updateBlog)
 
 route.delete("/blogs/:id",verifyUser,removeBlog)
+
+route.post("/blogs/like/:id",verifyUser,likeBlog)
 
 module.exports = route;
