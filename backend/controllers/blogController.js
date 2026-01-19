@@ -82,31 +82,37 @@ async function getBlogById(req,res){
 }
 async function updateBlog(req,res){
      try{
+       
         const {id} = req.params;
-        const updatedBlog = await Blog.findByIdAndUpdate(
-            id,
-            req.body,
-            {new:true}
-        )
+        const {title,description,draft} = req.body;
 
-        if(!updatedBlog){
-            return res.status(404).json({
-                message: "Blog not found!"
-            })
+        const user = await User.findById(creator).select("-password")
+
+        const blog = await Blog.findById(id)
+        if(!(creator === blog.creator)){
+            return res.status(500).json({
+                message: "You are not authorized for this action"
+            });
         }
 
-         return res.status(200).json({
-      message: "Blog updated successfully",
-      updatedBlog,
-    });
+        blog.title = title || blog.title;
+        blog.description = description || blog.description;
+        blog.draft = draft || blog.draft;
 
+        await blog.save();
 
-    }
-   catch (err) {
-    return res.status(500).json({
-      message: err.message,
-    });
-  }
+        return res.status(200).json({
+            success:true,
+            message:"Blog updated successfully",
+            blog,
+        })
+
+     }catch(err){
+        return res.status(500).json({
+            message:err.message
+        })
+
+     }
 }
 
 async function removeBlog(req, res) {
