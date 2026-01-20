@@ -14,15 +14,6 @@ app.use(cors())
 app.use("/api/v1",userRoute)
 app.use("/api/v1",blogRoute)
 
-
-
-
-
-
-
-
-
-
 app.listen(3000,()=>{
     console.log("server started");
     dbConnect();

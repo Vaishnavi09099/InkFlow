@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken")
 
 async function generateJWT(payload){
-   let token = await jwt.sign(payload,"jwtkabhautjadakhatarnak",{expiresIn : "1h"})
+   let token = await jwt.sign(payload,"jwtkabhautjadakhatarnak",{expiresIn : "30d"})
    return token
 
 }

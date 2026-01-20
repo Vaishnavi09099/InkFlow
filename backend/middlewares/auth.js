@@ -3,6 +3,7 @@ const {verifyJWT} = require("../utils/generateToken")
 
 
 const verifyUser = async (req,res,next)=>{
+ 
   try{
 
      let token = req.headers.authorization.split(" ")[1]
@@ -32,6 +33,10 @@ const verifyUser = async (req,res,next)=>{
 
    }
 catch(err){
+    return res.status(400).json({
+    success:false,
+    message:"Token missing"
+  })
 
 
 }

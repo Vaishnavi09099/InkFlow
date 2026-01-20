@@ -1,5 +1,7 @@
 const Blog = require("../models/blogSchema");
 const User = require("../models/userSchema");
+
+
 const {verifyJWT, decodeJWT} = require("../utils/generateToken")
 
 //safe controllers
@@ -56,6 +58,13 @@ async function getBlogs(req,res){
             path:"likes",
             select:"email name"
 
+        }).populate({
+            path:"comments",
+              populate:{
+                path:"user",
+                select:"name email"
+              }
+            
         })
         
         return res.status(200).json({
@@ -174,6 +183,54 @@ async function removeBlog(req, res) {
   }
 }
 
+async function commentBlog(req, res) {
+  try {
+  
+    //kon kararaha hai 
+    // kispr krre ho
+    // kya krre ho;
+      const creator =req.user
+    const { id } = req.params;
+    const {comment} = req.body;
+
+    if(!comment){
+      return res.status(500).json({
+        message:"Please enter the comment",
+      })
+    }
+
+  const blog = await Blog.findById(id)
+
+  if(!blog){
+    return res.status(500).json({
+        message: "Blog is not found"
+    })
+  }
+  //create the comment
+  const newComment = await Comment.create({
+    comment,
+    blog:id,
+    user:creator});
+
+
+  await Blog.findByIdAndUpdate(id,{
+    $push:{comments:newComment._id}
+  })
+
+  return res.status(200).json({
+    success:true,
+    message:"Comment added successfully"
+  })
+
+       
+
+
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+}
 async function likeBlog(req, res) {
   try {
     const creator =req.user;
@@ -214,6 +271,48 @@ async function likeBlog(req, res) {
   }
 }
 
+async function deleteComment(req,res){
+  try{
+    const userId = req.user._id;
+    const {id} = req.params;
+
+    const comment = await Comment.findById(id);
+
+    if(!comment){
+      return res.status(500).json({
+        message:"Comment not found",
+      })
+    }
+
+    if(comment.user !=userId && comment.blog.creator != userId){
+      return res.status(500).json({
+        message:"You are not authorized",
+      })
+    }
+
+    await Blog.findByIdAndUpdate(comment.blog._id,{
+      $pull :{ comments:id},
+    });
+
+    await Comment.findByIdAndDelete(id);
+    
+     return res.status(200).json({
+      message: "Comment deleted successfully",
+    });
+
+  }
+  catch(err){
+     return res.status(500).json({
+      message: err.message,
+    });
+
+
+  }
+
+}
+
+
+
 
 module.exports ={
     createBlog,
@@ -221,5 +320,6 @@ module.exports ={
     getBlogById,
     updateBlog,
     likeBlog,
-    removeBlog
+    removeBlog,
+    
 }
