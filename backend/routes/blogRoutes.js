@@ -1,5 +1,6 @@
 const express = require("express")
 const verifyUser = require("../middlewares/auth")
+const upload = require("../utils/multer")
 
 const {
       createBlog,
@@ -22,7 +23,7 @@ const {
 const route = express.Router();
 
 //blogs
-route.post("/blogs",verifyUser,createBlog)
+route.post("/blogs",verifyUser, upload.single("image") , createBlog)
 route.get("/blogs",getBlogs)
 route.get("/blogs/:id",verifyUser,getBlogById)
 route.patch("/blogs/:id",verifyUser,updateBlog)

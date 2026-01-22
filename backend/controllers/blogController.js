@@ -1,17 +1,19 @@
 const Blog = require("../models/blogSchema");
 const User = require("../models/userSchema");
-
+const uploadImage = require("../utils/uploadImage")
+const fs = require("fs")
 
 const {verifyJWT, decodeJWT} = require("../utils/generateToken")
 
 //safe controllers
 async function createBlog(req,res){
     try{
-       console.log("Create blog controller");
+     
        
        const creator = req.user;
     
         const {title,description,draft}=req.body;
+        const image = req.file;
         if(!title){
             return res.status(400).json({
                 message:"Please fill title",
@@ -31,7 +33,13 @@ async function createBlog(req,res){
             })
         }
 
-        const blog = await Blog.create({description,title,draft,creator});
+        //cloudinary wali prakriya start kro
+        const {secure_url,public_id} = await uploadImage(image.path)
+        fs.unlinkSync(image.path)
+
+
+
+        const blog = await Blog.create({description,title,draft,creator,image:secure_url,imageId:public_id});
 
         await User.findByIdAndUpdate(creator,{$push: {blogs:blog._id}});
 
@@ -162,6 +170,7 @@ async function removeBlog(req, res) {
             });
         }
 
+        await deleteImagefromCloudinary(blog.imageId);
         await Blog.findByIdAndDelete(id);
     await User.findByIdAndUpdate(creator,{$pull : {blogs: id}})
 

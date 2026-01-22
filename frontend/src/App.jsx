@@ -1,28 +1,24 @@
-
-import React from 'react'
-import { Routes ,Route } from 'react-router-dom'
-import Blogs from './components/Blogs'
-import SignUp from './pages/signUp'
-import SignIn from './pages/signIn'
-import CreateBlogs from './components/CreateBlogs'
-
-
-
-
-
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import Signin from './pages/Signin'
+import Signup from './pages/Signup'
+import { Route, Routes } from 'react-router-dom'
 
 
 function App() {
+ 
+
   return (
-    <Routes>
-      <Route path="/blogs" element={<Blogs/>}></Route>
-      <Route path="/signUp" element={<SignUp/>}></Route>
-      <Route path="/signIn" element={<SignIn />}></Route>
-       <Route path="/create-blog" element={<CreateBlogs />}></Route>
-       <Route path="*" element={<h1>Kya kar raha hai bhai tu</h1>}></Route>
-    </Routes>
+    <div className='bg-slate-700 h-screen w-screen flex justify-center items-center'>
+   <Routes>
+    <Route path="/"></Route>
+    <Route path="/signin" element={<Signin/>}></Route>
+    <Route path="/signup" element={<Signup/>}></Route>
+   </Routes>
+   </div>
   )
-  
 }
 
-export default App
+export default App;

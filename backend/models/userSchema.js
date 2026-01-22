@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
         unique:true
     },
     password : String,
+    
     blogs:[
         {
             type:mongoose.Schema.Types.ObjectId,

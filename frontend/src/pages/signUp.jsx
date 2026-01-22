@@ -1,82 +1,37 @@
-import React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import React from 'react'
 
+const Signup = () => {
+    async function handleRegister(e){
+        e.preventdefault();
+        alert("okbro");
 
-function SignUp(){
-    const [userData,setUserData] = useState({
-    name: "" ,
-    email:"",
-    password:"",
-  })
-
- 
-  async function handleSubmit(e){
-     e.preventDefault();
-    let data = await fetch('http://localhost:3000/api/v1/users',{
-      method:'POST',
-      body:JSON.stringify(userData),
-      headers:{
-      "Content-type": "application/json"
-      }
-
-    })
-
-    let res = await data.json()
-    if(res.success){
-    localStorage.setItem("user",JSON.stringify(res.user));
     }
-    alert(res.message);
-    
-  }
-    return (
-    <div>
-      <h1>Sign up</h1>
-      <div>
+  return (
+    <div className='w-[20%] flex flex-col items-center gap-5'>
+        <h1 className='text-3xl'>SignUp</h1>
+        <form className='w-[100%] flex flex-col items-center gap-5'>
         <input 
-        onChange={(e)=>
-          setUserData((prev)=>({
-            ...prev,
-            name:e.target.value,
-          }))
-        }
-        
-        type="text" placeholder='name' />
-        <br />
-        <br />
+        type="text" 
+        className="w-full h-[50px] text-white text-xl p-2 rounded-md focus:outline-none bg-gray-500"
+        placeholder='enter your name'
+        />
         <input 
-        onChange={(e)=>
-          setUserData((prev)=>({
-            ...prev,
-            email:e.target.value,
-          }))
-        }
-        
-        type="text" placeholder='email' />
-          <br />
-        <br />
+        type="email" 
+        className="w-full h-[50px] text-white text-xl p-2 rounded-md focus:outline-none bg-gray-500"
+        placeholder='enter your email'
+        />
         <input 
-        onChange={(e)=>setUserData((prev)=>({
-          ...prev,
-          password:e.target.value
-        }))}
-        
-        type="text" placeholder='password' />
-      </div>
-        <br />
-        <br />
-      <button onClick={handleSubmit}>Submit</button>
+        type="password" 
+        className="w-full h-[50px] text-white text-xl p-2 rounded-md focus:outline-none bg-gray-500"
+        placeholder='enter your password'
+        />
+        <button onClick={handleRegister} className='w-[100px] h-[50px] text-white text-xl p-2 rounded-md focus:outline-none bg-gray-500'>
+           Register
+        </button>
+        </form>
 
-
-
-<div>
- 
-</div>
-      
     </div>
-    
- 
   )
 }
 
-export default SignUp;
+export default Signup;
