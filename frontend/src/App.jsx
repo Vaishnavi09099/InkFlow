@@ -5,6 +5,7 @@ import './App.css'
 import Signin from './pages/Signin'
 import Signup from './pages/Signup'
 import { Route, Routes } from 'react-router-dom'
+import AuthForm from './pages/authForm'
 
 
 function App() {
@@ -14,8 +15,8 @@ function App() {
     <div className='bg-slate-700 h-screen w-screen flex justify-center items-center'>
    <Routes>
     <Route path="/"></Route>
-    <Route path="/signin" element={<Signin/>}></Route>
-    <Route path="/signup" element={<Signup/>}></Route>
+    <Route path="/signin" element={<AuthForm type={"signin"}/>}></Route>
+    <Route path="/signup" element={<AuthForm  type={"signup"} />}></Route>
    </Routes>
    </div>
   )

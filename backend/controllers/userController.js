@@ -5,7 +5,7 @@ const {generateJWT} = require("../utils/generateToken")
 
 async function createUser(req,res){
     const{name,password,email }=req.body;
-    console.log(req.body)
+   
 
     try{
         if(!name){
@@ -57,10 +57,12 @@ async function createUser(req,res){
             user: {
                 name :newUser.name,
                 email:newUser.email,
-                blogs:newUser.blogs,
-                  token
+           
+               
                 
             },
+
+            token
           
         });
 
@@ -127,7 +129,11 @@ if(!checkForPass){
         return res.status(200).json({
             success:true,
             message:"User LogedIn successfully",
-            user:checkForExistingUser,
+            user:{
+                name: checkForExistingUser.name,
+                email:checkForExistingUser.email,
+            
+            },
             token
           
         });

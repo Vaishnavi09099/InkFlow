@@ -14,8 +14,8 @@ const route = express.Router();
 
 
 
-route.post("/users",createUser)
-route.post("/login",loginUser)
+route.post("/signup",createUser)
+route.post("/signin",loginUser)
 
 route.get("/users",getUsers)
 
