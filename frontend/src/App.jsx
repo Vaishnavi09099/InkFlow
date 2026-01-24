@@ -8,6 +8,7 @@ import { Route, Routes } from 'react-router-dom'
 import AuthForm from './pages/authForm'
 import Navbar from './components/Navbar'
 import HomePage from './components/HomePage'
+import AddBlog from './pages/AddBlog'
 
 
 
@@ -22,6 +23,7 @@ function App() {
       <Route path="/signin" element={<AuthForm type={"signin"}/>}></Route>
       <Route path="/" element={<HomePage/>}></Route>
     <Route path="/signup" element={<AuthForm  type={"signup"} />}></Route>
+    <Route path="/add-blog" element={<AddBlog/>}></Route>
     
     </Route>
   
