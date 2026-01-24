@@ -1,6 +1,6 @@
 const Blog = require("../models/blogSchema");
 const User = require("../models/userSchema");
-const uploadImage = require("../utils/uploadImage")
+const {uploadImage} = require("../utils/uploadImage")
 const fs = require("fs")
 
 const {verifyJWT, decodeJWT} = require("../utils/generateToken")

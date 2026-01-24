@@ -6,17 +6,25 @@ import Signin from './pages/Signin'
 import Signup from './pages/Signup'
 import { Route, Routes } from 'react-router-dom'
 import AuthForm from './pages/authForm'
+import Navbar from './components/Navbar'
+import HomePage from './components/HomePage'
+
 
 
 function App() {
  
 
   return (
-    <div className='bg-slate-700 h-screen w-screen flex justify-center items-center'>
+    <div className='bg-slate-400 h-screen w-screen'>
    <Routes>
-    <Route path="/"></Route>
-    <Route path="/signin" element={<AuthForm type={"signin"}/>}></Route>
+    <Route path="/" element={<Navbar />}>
+    
+      <Route path="/signin" element={<AuthForm type={"signin"}/>}></Route>
+      <Route path="/" element={<HomePage/>}></Route>
     <Route path="/signup" element={<AuthForm  type={"signup"} />}></Route>
+    
+    </Route>
+  
    </Routes>
    </div>
   )

@@ -41,7 +41,7 @@ const res = await axios.post(`http://localhost:3000/api/v1/${type}`,userData);
 
     }
   return (
-    <div className='w-[20%] flex flex-col items-center gap-5'>
+    <div className='  w-[20%] flex flex-col mt-32 items-center gap-5'>
         <h1 className='text-3xl'>{type ==="signin" ? "Sign In ":"Sign up"}</h1>
         <form onSubmit={handleRegister} className='w-[100%] flex flex-col items-center gap-5'>
       
