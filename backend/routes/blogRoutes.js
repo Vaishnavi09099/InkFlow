@@ -25,7 +25,7 @@ const route = express.Router();
 //blogs
 route.post("/blogs",verifyUser, upload.single("image") , createBlog)
 route.get("/blogs",getBlogs)
-route.get("/blogs/:id",verifyUser,getBlogById)
+route.get("/blogs/:blogId",verifyUser,getBlogById)
 route.patch("/blogs/:id",verifyUser,updateBlog)
 route.delete("/blogs/:id",verifyUser,removeBlog)
 

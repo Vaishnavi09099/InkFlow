@@ -2,6 +2,10 @@ const Blog = require("../models/blogSchema");
 const User = require("../models/userSchema");
 const {uploadImage} = require("../utils/uploadImage")
 const fs = require("fs")
+const uniqid = require("uniqid")
+const { randomUUID } = require("crypto");
+
+
 
 const {verifyJWT, decodeJWT} = require("../utils/generateToken")
 
@@ -37,9 +41,11 @@ async function createBlog(req,res){
         const {secure_url,public_id} = await uploadImage(image.path)
         fs.unlinkSync(image.path)
 
+        const blogId = title.toLowerCase().split(" ").join("-")+"-"+randomUUID();
 
 
-        const blog = await Blog.create({description,title,draft,creator,image:secure_url,imageId:public_id});
+
+        const blog = await Blog.create({description,title,draft,blogId,creator,image:secure_url,imageId:public_id});
 
         await User.findByIdAndUpdate(creator,{$push: {blogs:blog._id}});
 
@@ -90,25 +96,22 @@ async function getBlogs(req,res){
 }
 async function getBlogById(req, res) {
   try {
-    const creator = req.user; // JWT middleware se aaya
-
-    // user exist karta hai ya nahi
-    const user = await User.findById(creator).select("-password");
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    // us user ke blogs nikaalo
-    const blogs = await Blog.find({ creator });
-
+    const {blogId} =req.params;
+    const blog =await Blog.findOne({ blogId}).populate({
+      path:"comments",
+      populate:{
+        path:"user",
+        select:"name email",
+      }
+    }).populate({
+      path:"creator",
+      select:"name email"
+    
+    })
     return res.status(200).json({
-      success: true,
-      message: "User blogs fetched successfully",
-      blogs,
-    });
+      message:"Blog fetched successfully",
+      blog
+    })
 
   } catch (err) {
     return res.status(500).json({

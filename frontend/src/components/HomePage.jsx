@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from "axios";
+import { Link } from 'react-router-dom';
 
 
 const HomePage = () => {
@@ -16,7 +17,9 @@ const HomePage = () => {
   return (
     <div className='w-[60%]'>
        { blogs.map(blog => (
-   <div key={blog._id} className='w-full my-20 flex justify-between'>
+
+        <Link to={"blog/" + blog.blogId}>
+           <div key={blog._id} className='w-full my-20 flex justify-between'>
             <div className='w-[60%] flex flex-col gap-2'>
                 <div>
                     <img src=""></img>
@@ -36,6 +39,8 @@ const HomePage = () => {
                 <img src={blog.image}></img>
             </div>
         </div>
+        </Link>
+
         ))
     }
 

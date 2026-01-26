@@ -9,6 +9,8 @@ import AuthForm from './pages/authForm'
 import Navbar from './components/Navbar'
 import HomePage from './components/HomePage'
 import AddBlog from './pages/AddBlog'
+import BlogPage from './pages/BlogPage'
+
 
 
 
@@ -24,6 +26,7 @@ function App() {
       <Route path="/" element={<HomePage/>}></Route>
     <Route path="/signup" element={<AuthForm  type={"signup"} />}></Route>
     <Route path="/add-blog" element={<AddBlog/>}></Route>
+    <Route path="/blog/:id" element={<BlogPage/>}></Route>
     
     </Route>
   
