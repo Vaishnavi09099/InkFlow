@@ -1,6 +1,6 @@
 const Blog = require("../models/blogSchema");
 const User = require("../models/userSchema");
-const {uploadImage} = require("../utils/uploadImage")
+const {uploadImage, deleteImagefromCloudinary} = require("../utils/uploadImage")
 const fs = require("fs")
 const uniqid = require("uniqid")
 const { randomUUID } = require("crypto");
@@ -108,6 +108,12 @@ async function getBlogById(req, res) {
       select:"name email"
     
     })
+
+    if(!blog){
+      return res.status(404).json({
+        message:"Blog not found",
+      })
+    }
     return res.status(200).json({
       message:"Blog fetched successfully",
       blog
@@ -120,40 +126,70 @@ async function getBlogById(req, res) {
   }
 }
 
-async function updateBlog(req,res){
-     try{
-       
-        const {id} = req.params;
-        const {title,description,draft} = req.body;
+async function updateBlog(req, res) {
+  try {
+    const userId = req.user._id || req.user;
+    const { id } = req.params;
+    const { title, description, draft } = req.body;
+const image = req.file;
+    const blog = await Blog.findOne({ blogId: id });
 
-        const user = await User.findById(creator).select("-password")
+    if (!blog) {
+      return res.status(404).json({
+        message: "Blog not found",
+      });
+    }
 
-        const blog = await Blog.findById(id)
-        if(!(creator === blog.creator)){
-            return res.status(500).json({
-                message: "You are not authorized for this action"
-            });
-        }
+    if (!blog.creator) {
+      return res.status(400).json({
+        message: "Blog creator missing",
+      });
+    }
 
-        blog.title = title || blog.title;
-        blog.description = description || blog.description;
-        blog.draft = draft || blog.draft;
+    if (blog.creator.toString() !== userId.toString()) {
+      return res.status(403).json({
+        message: "You are not authorized for this action",
+      });
+    } 
 
-        await blog.save();
 
-        return res.status(200).json({
-            success:true,
-            message:"Blog updated successfully",
-            blog,
-        })
 
-     }catch(err){
-        return res.status(500).json({
-            message:err.message
-        })
+if (image) {
 
-     }
+  if (blog.imageId) {
+    await deleteImagefromCloudinary(blog.imageId);
+  }
+
+  const { secure_url, public_id } = await uploadImage(image.path);
+
+
+  blog.image = secure_url;
+  blog.imageId = public_id;
+
+ 
+  fs.unlinkSync(image.path);
 }
+
+
+    blog.title = title || blog.title;
+    blog.description = description || blog.description;
+    blog.draft = draft ?? blog.draft;
+
+    await blog.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Blog updated successfully",
+      blog,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+}
+
+
 
 async function removeBlog(req, res) {
   try {

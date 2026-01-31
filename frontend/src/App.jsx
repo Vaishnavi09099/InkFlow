@@ -27,6 +27,7 @@ function App() {
     <Route path="/signup" element={<AuthForm  type={"signup"} />}></Route>
     <Route path="/add-blog" element={<AddBlog/>}></Route>
     <Route path="/blog/:id" element={<BlogPage/>}></Route>
+    <Route path="/edit/:id" element={<AddBlog />}></Route>
     
     </Route>
   
